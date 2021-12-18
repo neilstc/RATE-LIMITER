@@ -35,7 +35,7 @@ func appInit() string {
 	flag.Parse()
 
 	checkport, _ := strconv.Atoi(*portPtr)
-	if *thresholdPtr < 0 || *ttlPtr < 0 || checkport <= 1023 && checkport >= 49151 {
+	if *thresholdPtr < 0 || *ttlPtr < 0 || checkport <= 1023 || checkport >= 49151 {
 		fmt.Fprintf(os.Stderr, "error: %v\n", "illegal command line arguments!")
 		os.Exit(1)
 	}
