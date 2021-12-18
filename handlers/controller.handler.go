@@ -47,5 +47,4 @@ func ValidateStruct(urlDto UrlDto) error {
 	validate := validator.New()
 	err := validate.Struct(urlDto)
 	return err
-
 }
