@@ -43,6 +43,7 @@ func appInit() string {
 	services.UrlCache.Threshold = *thresholdPtr
 	services.UrlCache.Ttl = *ttlPtr
 	services.UrlCache.Urls = make(map[string]int)
+	services.UrlTtlTracker = make(map[int64][]string)
 	port := *portPtr
 
 	fmt.Println("app initialized")

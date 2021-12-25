@@ -1,12 +1,11 @@
 package services
 
 import (
+	"encoding/base64"
 	"fmt"
 	"sync"
 	"time"
 )
-
-var UrlCache UrlCacheStruct
 
 type UrlCacheStruct struct {
 	RWMutex   sync.RWMutex
@@ -15,22 +14,32 @@ type UrlCacheStruct struct {
 	Threshold int
 }
 
-func AddEntry(url string) bool {
+var UrlCache UrlCacheStruct
+var UrlTtlTracker map[int64][]string
 
+func AddEntry(url string) bool {
+	urlHash := base64.StdEncoding.EncodeToString([]byte(url))
 	isBlocked := false
-	UrlCache.RWMutex.Lock()
 	dt := time.Now()
-	if count, ok := UrlCache.Urls[url]; ok {
+	if count, ok := UrlCache.Urls[urlHash]; ok {
 		if count < UrlCache.Threshold {
-			UrlCache.Urls[url] = count + 1
+			UrlCache.RWMutex.Lock()
+			UrlCache.Urls[urlHash] = count + 1
+			UrlCache.RWMutex.Unlock()
 		} else {
 			isBlocked = true
 		}
 	} else {
-		UrlCache.Urls[url] = 1
-	}
-	UrlCache.RWMutex.Unlock()
-	fmt.Println(dt.Format("00:00:00"), "URL: ", url, "is reported, ", "count:=", UrlCache.Urls[url], ", blocked? ", isBlocked)
+		fmt.Println("new entry:  ", url)
+		urlTtl := time.Now().Add(time.Duration(UrlCache.Ttl) * time.Millisecond).UnixMilli()
 
+		UrlCache.RWMutex.Lock()
+		UrlCache.Urls[urlHash] = 1
+		UrlCache.RWMutex.Unlock()
+
+		//put inside tracker
+		UrlTtlTracker[urlTtl] = append(UrlTtlTracker[urlTtl], urlHash)
+	}
+	fmt.Println(dt.Format("15:04:05"), "URL: ", url, "is reported, ", "count:=", UrlCache.Urls[urlHash], ", blocked? ", isBlocked)
 	return isBlocked
 }
