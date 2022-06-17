@@ -1,13 +1,5 @@
 # RATE-LIMITER
 
-Hey Yaniv, Alex and Alexander,
-Here is my assignment! :>
-
-i Used the express-like Framework "fiber" to write this assignment,
-so you might need to download the package :) (srry)
-go 1.14 or higher is required.
-- go get -u github.com/gofiber/fiber/v2 
-
 
 command to run:
 go run app.go -threshold <num >= 0> -ttl <num >= 0> -port < num >= 1023 > 49151
